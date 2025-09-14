@@ -70,7 +70,10 @@ class AdminController extends Controller {
                         if (!empty($tmpName)) {
                             $file = [
                                 'tmp_name' => $tmpName,
-                                'name' => $_FILES['images']['name'][$key]
+                                'name' => $_FILES['images']['name'][$key],
+                                'type' => $_FILES['images']['type'][$key],
+                                'size' => $_FILES['images']['size'][$key],
+                                'error' => $_FILES['images']['error'][$key]
                             ];
                             $imagePath = $this->uploadFile($file, 'uploads/products/');
                             if ($imagePath) {
@@ -145,19 +148,29 @@ class AdminController extends Controller {
             if (empty($errors)) {
                 $this->productModel->update($id, $data);
                 
+                $uploadMessages = [];
+                
                 // Upload de novas imagens
                 if (!empty($_FILES['images']['name'][0])) {
+                    $uploadedImages = 0;
                     foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
                         if (!empty($tmpName)) {
                             $file = [
                                 'tmp_name' => $tmpName,
-                                'name' => $_FILES['images']['name'][$key]
+                                'name' => $_FILES['images']['name'][$key],
+                                'type' => $_FILES['images']['type'][$key],
+                                'size' => $_FILES['images']['size'][$key],
+                                'error' => $_FILES['images']['error'][$key]
                             ];
                             $imagePath = $this->uploadFile($file, 'uploads/products/');
                             if ($imagePath) {
                                 $this->productModel->addImage($id, $imagePath, false);
+                                $uploadedImages++;
                             }
                         }
+                    }
+                    if ($uploadedImages > 0) {
+                        $uploadMessages[] = "$uploadedImages imagem(ns) adicionada(s) com sucesso!";
                     }
                 }
                 
@@ -166,12 +179,20 @@ class AdminController extends Controller {
                     $videoPath = $this->uploadFile($_FILES['video'], 'uploads/videos/');
                     if ($videoPath) {
                         $this->productModel->addVideo($id, $videoPath);
+                        $uploadMessages[] = "Vídeo adicionado com sucesso!";
                     }
                 }
                 
                 // URL de vídeo
                 if (!empty($_POST['video_url'])) {
                     $this->productModel->addVideo($id, null, $_POST['video_url']);
+                    $uploadMessages[] = "URL de vídeo adicionada com sucesso!";
+                }
+                
+                if (!empty($uploadMessages)) {
+                    $_SESSION['success_message'] = implode(' ', $uploadMessages);
+                } else {
+                    $_SESSION['success_message'] = 'Produto atualizado com sucesso!';
                 }
                 
                 $this->redirect(BASE_URL . '?controller=admin&action=products');
@@ -301,6 +322,13 @@ class AdminController extends Controller {
         }
         
         $this->redirect(BASE_URL . '?controller=admin&action=settings');
+    }
+    
+    /**
+     * Método público para upload de arquivos
+     */
+    public function uploadFile($file, $directory = 'uploads/') {
+        return parent::uploadFile($file, $directory);
     }
 }
 ?>

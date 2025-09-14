@@ -10,6 +10,23 @@
                 </a>
             </div>
             
+            <!-- Mensagens de feedback -->
+            <?php if (isset($_SESSION['success_message'])): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> <?= $_SESSION['success_message'] ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php unset($_SESSION['success_message']); ?>
+            <?php endif; ?>
+            
+            <?php if (isset($_SESSION['error_message'])): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> <?= $_SESSION['error_message'] ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <?php unset($_SESSION['error_message']); ?>
+            <?php endif; ?>
+            
             <?php if (empty($products)): ?>
                 <div class="alert alert-info text-center">
                     <i class="fas fa-info-circle"></i> Nenhum produto cadastrado ainda.
