@@ -11,10 +11,7 @@ class Settings {
      * Busca uma configuração específica por chave
      */
     public function get($key) {
-        $stmt = $this->db->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
-        $stmt->execute([$key]);
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+        $result = $this->db->fetch("SELECT setting_value FROM settings WHERE setting_key = ?", [$key]);
         return $result ? $result['setting_value'] : null;
     }
     
@@ -22,43 +19,41 @@ class Settings {
      * Busca todas as configurações
      */
     public function getAll() {
-        $stmt = $this->db->prepare("SELECT * FROM settings ORDER BY setting_key");
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $this->db->fetchAll("SELECT * FROM settings ORDER BY setting_key");
     }
     
     /**
      * Atualiza uma configuração específica
      */
     public function update($key, $value) {
-        $stmt = $this->db->prepare("UPDATE settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?");
-        return $stmt->execute([$value, $key]);
+        $stmt = $this->db->query("UPDATE settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?", [$value, $key]);
+        return $stmt->rowCount() > 0;
     }
     
     /**
      * Insere uma nova configuração
      */
     public function create($key, $value, $description = '') {
-        $stmt = $this->db->prepare("INSERT INTO settings (setting_key, setting_value, description) VALUES (?, ?, ?)");
-        return $stmt->execute([$key, $value, $description]);
+        $stmt = $this->db->query("INSERT INTO settings (setting_key, setting_value, description) VALUES (?, ?, ?)", [$key, $value, $description]);
+        return $stmt->rowCount() > 0;
     }
     
     /**
      * Atualiza múltiplas configurações
      */
     public function updateMultiple($settings) {
-        $this->db->beginTransaction();
+        $connection = $this->db->getConnection();
+        $connection->beginTransaction();
         
         try {
             foreach ($settings as $key => $value) {
-                $stmt = $this->db->prepare("UPDATE settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?");
-                $stmt->execute([$value, $key]);
+                $stmt = $this->db->query("UPDATE settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?", [$value, $key]);
             }
             
-            $this->db->commit();
+            $connection->commit();
             return true;
         } catch (Exception $e) {
-            $this->db->rollback();
+            $connection->rollback();
             return false;
         }
     }
@@ -67,9 +62,8 @@ class Settings {
      * Verifica se uma configuração existe
      */
     public function exists($key) {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM settings WHERE setting_key = ?");
-        $stmt->execute([$key]);
-        return $stmt->fetchColumn() > 0;
+        $result = $this->db->fetch("SELECT COUNT(*) as count FROM settings WHERE setting_key = ?", [$key]);
+        return $result['count'] > 0;
     }
 }
 ?>
