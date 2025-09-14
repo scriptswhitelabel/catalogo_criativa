@@ -6,6 +6,7 @@ class AdminController extends Controller {
     private $orderModel;
     private $categoryModel;
     private $brandModel;
+    private $settingsModel;
     
     public function __construct() {
         parent::__construct();
@@ -16,6 +17,7 @@ class AdminController extends Controller {
         $this->orderModel = new Order();
         $this->categoryModel = new Category();
         $this->brandModel = new Brand();
+        $this->settingsModel = new Settings();
     }
     
     public function dashboard() {
@@ -217,6 +219,55 @@ class AdminController extends Controller {
         }
         
         $this->redirect(BASE_URL . '?controller=admin&action=orderDetail&id=' . $id);
+    }
+    
+    public function settings() {
+        $settings = $this->settingsModel->getAll();
+        
+        // Converter array de configurações para formato mais fácil de usar
+        $settingsData = [];
+        foreach ($settings as $setting) {
+            $settingsData[$setting['setting_key']] = $setting['setting_value'];
+        }
+        
+        $this->view('admin/settings', ['settings' => $settingsData]);
+    }
+    
+    public function updateSettings() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $settings = [
+                'store_name' => $_POST['store_name'] ?? '',
+                'store_phone' => $_POST['store_phone'] ?? '',
+                'store_email' => $_POST['store_email'] ?? '',
+                'store_address' => $_POST['store_address'] ?? ''
+            ];
+            
+            // Upload da logomarca se fornecida
+            if (!empty($_FILES['store_logo']['tmp_name'])) {
+                $logoPath = $this->uploadFile($_FILES['store_logo'], 'uploads/settings/');
+                if ($logoPath) {
+                    $settings['store_logo'] = $logoPath;
+                }
+            } else {
+                // Manter a logomarca atual se não foi enviada nova
+                $currentLogo = $this->settingsModel->get('store_logo');
+                if ($currentLogo) {
+                    $settings['store_logo'] = $currentLogo;
+                }
+            }
+            
+            $success = $this->settingsModel->updateMultiple($settings);
+            
+            if ($success) {
+                $_SESSION['success_message'] = 'Configurações atualizadas com sucesso!';
+            } else {
+                $_SESSION['error_message'] = 'Erro ao atualizar configurações.';
+            }
+            
+            $this->redirect(BASE_URL . '?controller=admin&action=settings');
+        }
+        
+        $this->redirect(BASE_URL . '?controller=admin&action=settings');
     }
 }
 ?>

@@ -2,20 +2,34 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5><i class="fas fa-store"></i> Criativa Loja</h5>
+                    <h5>
+                        <?php if (SettingsHelper::hasLogo()): ?>
+                            <img src="<?= SettingsHelper::getLogoUrl() ?>" alt="<?= SettingsHelper::getStoreName() ?>" height="25" class="me-2">
+                        <?php else: ?>
+                            <i class="fas fa-store"></i>
+                        <?php endif; ?>
+                        <?= SettingsHelper::getStoreName() ?>
+                    </h5>
                     <p>Sua loja online de confiança com os melhores produtos.</p>
+                    <?php if (SettingsHelper::getStoreAddress()): ?>
+                        <p><i class="fas fa-map-marker-alt"></i> <?= htmlspecialchars(SettingsHelper::getStoreAddress()) ?></p>
+                    <?php endif; ?>
                 </div>
                 <div class="col-md-6 text-end">
                     <h6>Contato</h6>
                     <p>
-                        <i class="fas fa-envelope"></i> contato@criativa.com<br>
-                        <i class="fas fa-phone"></i> (11) 99999-9999
+                        <?php if (SettingsHelper::getStoreEmail()): ?>
+                            <i class="fas fa-envelope"></i> <?= htmlspecialchars(SettingsHelper::getStoreEmail()) ?><br>
+                        <?php endif; ?>
+                        <?php if (SettingsHelper::getStorePhone()): ?>
+                            <i class="fas fa-phone"></i> <?= htmlspecialchars(SettingsHelper::getStorePhone()) ?>
+                        <?php endif; ?>
                     </p>
                 </div>
             </div>
             <hr>
             <div class="text-center">
-                <p>&copy; <?= date('Y') ?> Criativa Loja. Todos os direitos reservados.</p>
+                <p>&copy; <?= date('Y') ?> <?= SettingsHelper::getStoreName() ?>. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>

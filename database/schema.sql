@@ -109,6 +109,24 @@ INSERT INTO brands (name, description) VALUES
 ('Adidas', 'Artigos esportivos Adidas'),
 ('Sony', 'Eletrônicos Sony');
 
+-- Tabela de configurações da loja
+CREATE TABLE settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) UNIQUE NOT NULL,
+    setting_value TEXT,
+    description VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Inserir configurações padrão
+INSERT INTO settings (setting_key, setting_value, description) VALUES 
+('store_logo', '', 'Logomarca da loja'),
+('store_phone', '', 'Telefone de contato da loja'),
+('store_email', '', 'Email de contato da loja'),
+('store_name', 'Catálogo Criativa', 'Nome da loja'),
+('store_address', '', 'Endereço da loja');
+
 -- Inserir alguns produtos de exemplo
 INSERT INTO products (name, brand_id, category_id, description, unit_price, package_price) VALUES 
 ('Smartphone Galaxy S21', 1, 1, 'Smartphone Samsung Galaxy S21 com 128GB', 2500.00, 2400.00),

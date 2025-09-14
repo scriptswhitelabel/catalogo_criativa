@@ -104,6 +104,15 @@
                             </a>
                         </div>
                     </div>
+                    
+                    <!-- Segunda linha de ações -->
+                    <div class="row mt-2">
+                        <div class="col-md-3">
+                            <a href="<?= BASE_URL ?>?controller=admin&action=settings" class="btn btn-outline-info w-100 mb-2">
+                                <i class="fas fa-cog"></i> Configurações da Loja
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
