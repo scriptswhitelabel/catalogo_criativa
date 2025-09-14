@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS criativa CHARACTER SET utf8mb4 COLLATE utf8mb4_uni
 USE criativa;
 
 -- Tabela de usuários (admin e clientes)
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE users (
 );
 
 -- Tabela de categorias
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -23,7 +23,7 @@ CREATE TABLE categories (
 );
 
 -- Tabela de marcas
-CREATE TABLE brands (
+CREATE TABLE IF NOT EXISTS brands (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -31,7 +31,7 @@ CREATE TABLE brands (
 );
 
 -- Tabela de produtos
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     brand_id INT,
@@ -47,7 +47,7 @@ CREATE TABLE products (
 );
 
 -- Tabela de imagens dos produtos
-CREATE TABLE product_images (
+CREATE TABLE IF NOT EXISTS product_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
     image_path VARCHAR(500) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE product_images (
 );
 
 -- Tabela de vídeos dos produtos
-CREATE TABLE product_videos (
+CREATE TABLE IF NOT EXISTS product_videos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
     video_path VARCHAR(500),
@@ -67,7 +67,7 @@ CREATE TABLE product_videos (
 );
 
 -- Tabela de pedidos
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE orders (
 );
 
 -- Tabela de itens do pedido
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
@@ -92,17 +92,17 @@ CREATE TABLE order_items (
 );
 
 -- Inserir dados iniciais
-INSERT INTO users (name, email, password, user_type) VALUES 
+INSERT IGNORE INTO users (name, email, password, user_type) VALUES 
 ('Administrador', 'admin@criativa.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');
 
-INSERT INTO categories (name, description) VALUES 
+INSERT IGNORE INTO categories (name, description) VALUES 
 ('Eletrônicos', 'Produtos eletrônicos diversos'),
 ('Roupas', 'Vestuário e acessórios'),
 ('Casa e Jardim', 'Produtos para casa e jardim'),
 ('Esportes', 'Artigos esportivos'),
 ('Livros', 'Livros e materiais educativos');
 
-INSERT INTO brands (name, description) VALUES 
+INSERT IGNORE INTO brands (name, description) VALUES 
 ('Samsung', 'Eletrônicos Samsung'),
 ('Nike', 'Artigos esportivos Nike'),
 ('Apple', 'Produtos Apple'),
@@ -110,7 +110,7 @@ INSERT INTO brands (name, description) VALUES
 ('Sony', 'Eletrônicos Sony');
 
 -- Tabela de configurações da loja
-CREATE TABLE settings (
+CREATE TABLE IF NOT EXISTS settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     setting_key VARCHAR(100) UNIQUE NOT NULL,
     setting_value TEXT,
@@ -120,7 +120,7 @@ CREATE TABLE settings (
 );
 
 -- Inserir configurações padrão
-INSERT INTO settings (setting_key, setting_value, description) VALUES 
+INSERT IGNORE INTO settings (setting_key, setting_value, description) VALUES 
 ('store_logo', '', 'Logomarca da loja'),
 ('store_phone', '', 'Telefone de contato da loja'),
 ('store_email', '', 'Email de contato da loja'),
@@ -128,7 +128,7 @@ INSERT INTO settings (setting_key, setting_value, description) VALUES
 ('store_address', '', 'Endereço da loja');
 
 -- Inserir alguns produtos de exemplo
-INSERT INTO products (name, brand_id, category_id, description, unit_price, package_price) VALUES 
+INSERT IGNORE INTO products (name, brand_id, category_id, description, unit_price, package_price) VALUES 
 ('Smartphone Galaxy S21', 1, 1, 'Smartphone Samsung Galaxy S21 com 128GB', 2500.00, 2400.00),
 ('Tênis Air Max', 2, 4, 'Tênis Nike Air Max confortável', 450.00, 400.00),
 ('iPhone 13', 3, 1, 'iPhone 13 Apple 128GB', 3500.00, 3300.00),
