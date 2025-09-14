@@ -42,7 +42,8 @@ class AdminController extends Controller {
         $this->view('admin/products', [
             'products' => $products,
             'categories' => $categories,
-            'brands' => $brands
+            'brands' => $brands,
+            'productModel' => $this->productModel
         ]);
     }
     
@@ -154,7 +155,8 @@ class AdminController extends Controller {
                 'errors' => $errors,
                 'data' => $data,
                 'categories' => $categories,
-                'brands' => $brands
+                'brands' => $brands,
+                'productModel' => $this->productModel
             ]);
         } else {
             $categories = $this->categoryModel->getAll();
@@ -163,7 +165,8 @@ class AdminController extends Controller {
             $this->view('admin/edit_product', [
                 'product' => $product,
                 'categories' => $categories,
-                'brands' => $brands
+                'brands' => $brands,
+                'productModel' => $this->productModel
             ]);
         }
     }

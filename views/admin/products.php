@@ -35,7 +35,6 @@
                                         <tr>
                                             <td>
                                                 <?php 
-                                                $productModel = new Product();
                                                 $images = $productModel->getImages($product['id']);
                                                 $primaryImage = null;
                                                 foreach ($images as $image) {
