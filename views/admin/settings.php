@@ -40,7 +40,7 @@
                                 <i class="fas fa-signature"></i> Nome da Loja
                             </label>
                             <input type="text" class="form-control" id="store_name" name="store_name" 
-                                   value="<?= htmlspecialchars($settings['store_name'] ?? '') ?>" 
+                                   value="<?= htmlspecialchars($settings['store_name'] ?? 'Catálogo Criativa') ?>" 
                                    placeholder="Digite o nome da sua loja">
                         </div>
                         
@@ -59,7 +59,7 @@
                             <?php if (!empty($settings['store_logo'])): ?>
                                 <div class="mt-2">
                                     <small class="text-muted">Logomarca atual:</small><br>
-                                    <img src="<?= BASE_URL . $settings['store_logo'] ?>" 
+                                    <img src="<?= BASE_URL . htmlspecialchars($settings['store_logo']) ?>" 
                                          alt="Logomarca atual" 
                                          class="img-thumbnail" 
                                          style="max-width: 200px; max-height: 100px;">
@@ -143,13 +143,13 @@
                 <div class="card-body">
                     <div class="text-center">
                         <?php if (!empty($settings['store_logo'])): ?>
-                            <img src="<?= BASE_URL . $settings['store_logo'] ?>" 
+                            <img src="<?= BASE_URL . htmlspecialchars($settings['store_logo']) ?>" 
                                  alt="Logomarca" 
                                  class="img-fluid mb-2" 
                                  style="max-height: 60px;">
                         <?php endif; ?>
                         
-                        <h6><?= htmlspecialchars($settings['store_name'] ?? 'Nome da Loja') ?></h6>
+                        <h6><?= htmlspecialchars($settings['store_name'] ?? 'Catálogo Criativa') ?></h6>
                         
                         <?php if (!empty($settings['store_phone'])): ?>
                             <p class="mb-1">

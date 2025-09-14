@@ -246,7 +246,7 @@ class AdminController extends Controller {
             if (!empty($_FILES['store_logo']['tmp_name'])) {
                 $logoPath = $this->uploadFile($_FILES['store_logo'], 'uploads/settings/');
                 if ($logoPath) {
-                    $settings['store_logo'] = $logoPath;
+                    $settings['store_logo'] = 'uploads/settings/' . $logoPath;
                 }
             } else {
                 // Manter a logomarca atual se não foi enviada nova
