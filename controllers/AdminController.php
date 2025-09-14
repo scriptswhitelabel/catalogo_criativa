@@ -144,6 +144,36 @@ class AdminController extends Controller {
             
             if (empty($errors)) {
                 $this->productModel->update($id, $data);
+                
+                // Upload de novas imagens
+                if (!empty($_FILES['images']['name'][0])) {
+                    foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
+                        if (!empty($tmpName)) {
+                            $file = [
+                                'tmp_name' => $tmpName,
+                                'name' => $_FILES['images']['name'][$key]
+                            ];
+                            $imagePath = $this->uploadFile($file, 'uploads/products/');
+                            if ($imagePath) {
+                                $this->productModel->addImage($id, $imagePath, false);
+                            }
+                        }
+                    }
+                }
+                
+                // Upload de vídeo
+                if (!empty($_FILES['video']['tmp_name'])) {
+                    $videoPath = $this->uploadFile($_FILES['video'], 'uploads/videos/');
+                    if ($videoPath) {
+                        $this->productModel->addVideo($id, $videoPath);
+                    }
+                }
+                
+                // URL de vídeo
+                if (!empty($_POST['video_url'])) {
+                    $this->productModel->addVideo($id, null, $_POST['video_url']);
+                }
+                
                 $this->redirect(BASE_URL . '?controller=admin&action=products');
             }
             

@@ -24,7 +24,7 @@
                         </div>
                     <?php endif; ?>
                     
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="mb-3">
@@ -101,6 +101,39 @@
                             </div>
                         </div>
                         
+                        <!-- Upload de Novas Imagens -->
+                        <div class="mb-3">
+                            <label for="images" class="form-label">
+                                <i class="fas fa-images"></i> Adicionar Novas Imagens
+                            </label>
+                            <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/*">
+                            <div class="form-text">
+                                Selecione uma ou mais imagens para adicionar ao produto. Formatos aceitos: JPG, PNG, GIF.
+                            </div>
+                        </div>
+                        
+                        <!-- Upload de Vídeo -->
+                        <div class="mb-3">
+                            <label for="video" class="form-label">
+                                <i class="fas fa-video"></i> Vídeo do Produto
+                            </label>
+                            <input type="file" class="form-control" id="video" name="video" accept="video/*">
+                            <div class="form-text">
+                                Upload de arquivo de vídeo (opcional).
+                            </div>
+                        </div>
+                        
+                        <!-- URL do Vídeo -->
+                        <div class="mb-3">
+                            <label for="video_url" class="form-label">
+                                <i class="fas fa-link"></i> URL do Vídeo (YouTube, Vimeo, etc.)
+                            </label>
+                            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=...">
+                            <div class="form-text">
+                                Cole aqui a URL do vídeo do produto (opcional).
+                            </div>
+                        </div>
+                        
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="<?= BASE_URL ?>?controller=admin&action=products" class="btn btn-outline-secondary">
                                 <i class="fas fa-arrow-left"></i> Voltar
@@ -134,6 +167,39 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <p class="text-muted">Nenhuma imagem cadastrada.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <!-- Vídeos Atuais -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5><i class="fas fa-video"></i> Vídeos Atuais</h5>
+                </div>
+                <div class="card-body">
+                    <?php 
+                    $videos = $productModel->getVideos($product['id']);
+                    if (!empty($videos)): 
+                    ?>
+                        <?php foreach ($videos as $video): ?>
+                            <div class="mb-2">
+                                <?php if ($video['video_path']): ?>
+                                    <video controls class="w-100" style="max-height: 200px;">
+                                        <source src="<?= BASE_URL ?>uploads/videos/<?= $video['video_path'] ?>" type="video/mp4">
+                                        Seu navegador não suporta vídeos.
+                                    </video>
+                                <?php elseif ($video['video_url']): ?>
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-external-link-alt"></i> 
+                                        <a href="<?= htmlspecialchars($video['video_url']) ?>" target="_blank" class="text-decoration-none">
+                                            Ver vídeo externo
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">Nenhum vídeo cadastrado.</p>
                     <?php endif; ?>
                 </div>
             </div>
