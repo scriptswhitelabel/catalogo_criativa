@@ -1,115 +1,96 @@
 <?php
+require_once __DIR__ . '/../core/Database.php';
 
 class Product {
     private $db;
-    
+
     public function __construct() {
-        $this->db = Database::getInstance();
+        $this->db = new Database();
     }
-    
-    public function create($data) {
-        $sql = "INSERT INTO products (name, brand_id, category_id, description, unit_price, package_price, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $params = [
-            $data['name'],
-            $data['brand_id'],
-            $data['category_id'],
-            $data['description'],
-            $data['unit_price'],
-            $data['package_price'] ?? null,
-            $data['status'] ?? 'available'
-        ];
-        
-        $this->db->query($sql, $params);
-        return $this->db->lastInsertId();
+
+    /**
+     * Retorna todos os produtos
+     */
+    public function getAll() {
+        $sql = "SELECT * FROM products ORDER BY id DESC";
+        return $this->db->query($sql)->fetchAll();
     }
-    
-    public function findById($id) {
-        $sql = "SELECT p.*, b.name as brand_name, c.name as category_name 
-                FROM products p 
-                LEFT JOIN brands b ON p.brand_id = b.id 
-                LEFT JOIN categories c ON p.category_id = c.id 
-                WHERE p.id = ?";
-        return $this->db->fetch($sql, [$id]);
+
+    /**
+     * Retorna um produto pelo ID
+     */
+    public function getById($id) {
+        $sql = "SELECT * FROM products WHERE id = ?";
+        return $this->db->query($sql, [$id])->fetch();
     }
-    
-    public function getAll($filters = []) {
-        $sql = "SELECT p.*, b.name as brand_name, c.name as category_name 
-                FROM products p 
-                LEFT JOIN brands b ON p.brand_id = b.id 
-                LEFT JOIN categories c ON p.category_id = c.id 
-                WHERE 1=1";
-        
-        $params = [];
-        
-        if (!empty($filters['status'])) {
-            $sql .= " AND p.status = ?";
-            $params[] = $filters['status'];
-        }
-        
-        if (!empty($filters['category_id'])) {
-            $sql .= " AND p.category_id = ?";
-            $params[] = $filters['category_id'];
-        }
-        
-        if (!empty($filters['brand_id'])) {
-            $sql .= " AND p.brand_id = ?";
-            $params[] = $filters['brand_id'];
-        }
-        
-        if (!empty($filters['search'])) {
-            $sql .= " AND (p.name LIKE ? OR p.description LIKE ?)";
-            $searchTerm = '%' . $filters['search'] . '%';
-            $params[] = $searchTerm;
-            $params[] = $searchTerm;
-        }
-        
-        $sql .= " ORDER BY p.created_at DESC";
-        
-        return $this->db->fetchAll($sql, $params);
+
+    /**
+     * Adiciona um novo produto
+     */
+    public function add($name, $description, $price, $stock) {
+        $sql = "INSERT INTO products (name, description, price, stock, created_at) 
+                VALUES (?, ?, ?, ?, NOW())";
+        return $this->db->query($sql, [$name, $description, $price, $stock]);
     }
-    
-    public function getAvailable() {
-        return $this->getAll(['status' => 'available']);
+
+    /**
+     * Atualiza um produto existente
+     */
+    public function update($id, $name, $description, $price, $stock) {
+        $sql = "UPDATE products 
+                SET name = ?, description = ?, price = ?, stock = ? 
+                WHERE id = ?";
+        return $this->db->query($sql, [$name, $description, $price, $stock, $id]);
     }
-    
-    public function update($id, $data) {
-        $fields = [];
-        $params = [];
-        
-        foreach ($data as $key => $value) {
-            $fields[] = "$key = ?";
-            $params[] = $value;
-        }
-        
-        $params[] = $id;
-        $sql = "UPDATE products SET " . implode(', ', $fields) . " WHERE id = ?";
-        
-        return $this->db->query($sql, $params);
-    }
-    
+
+    /**
+     * Remove um produto
+     */
     public function delete($id) {
-        $sql = "DELETE FROM products WHERE id = ?";
-        return $this->db->query($sql, [$id]);
+        // Exclui imagens associadas
+        $this->db->query("DELETE FROM product_images WHERE product_id = ?", [$id]);
+        // Exclui produto
+        return $this->db->query("DELETE FROM products WHERE id = ?", [$id]);
     }
-    
-    public function addImage($productId, $imagePath, $isPrimary = false) {
+
+    /**
+     * Retorna todas as imagens de um produto
+     */
+    public function getImages($productId) {
+        $sql = "SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC, id ASC";
+        return $this->db->query($sql, [$productId])->fetchAll();
+    }
+
+    /**
+     * Adiciona imagem ao produto
+     */
+    public function addImage($productId, $imagePath, $isPrimary = 0) {
+        // Garante que seja 0 ou 1
+        $isPrimary = (int) (empty($isPrimary) ? 0 : $isPrimary);
+
+        // Se for marcada como principal, remove principal anterior
+        if ($isPrimary === 1) {
+            $this->db->query("UPDATE product_images SET is_primary = 0 WHERE product_id = ?", [$productId]);
+        }
+
         $sql = "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, ?)";
         return $this->db->query($sql, [$productId, $imagePath, $isPrimary]);
     }
-    
-    public function getImages($productId) {
-        $sql = "SELECT * FROM product_images WHERE product_id = ? ORDER BY is_primary DESC";
-        return $this->db->fetchAll($sql, [$productId]);
+
+    /**
+     * Define imagem como principal
+     */
+    public function setPrimaryImage($imageId, $productId) {
+        // Remove principal anterior
+        $this->db->query("UPDATE product_images SET is_primary = 0 WHERE product_id = ?", [$productId]);
+        // Define nova principal
+        return $this->db->query("UPDATE product_images SET is_primary = 1 WHERE id = ?", [$imageId]);
     }
-    
-    public function addVideo($productId, $videoPath = null, $videoUrl = null) {
-        $sql = "INSERT INTO product_videos (product_id, video_path, video_url) VALUES (?, ?, ?)";
-        return $this->db->query($sql, [$productId, $videoPath, $videoUrl]);
-    }
-    
-    public function getVideos($productId) {
-        $sql = "SELECT * FROM product_videos WHERE product_id = ?";
-        return $this->db->fetchAll($sql, [$productId]);
+
+    /**
+     * Remove imagem do produto
+     */
+    public function deleteImage($imageId) {
+        return $this->db->query("DELETE FROM product_images WHERE id = ?", [$imageId]);
     }
 }
-?>
