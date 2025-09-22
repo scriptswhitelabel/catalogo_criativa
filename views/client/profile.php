@@ -31,6 +31,16 @@
                         </div>
                         
                         <div class="mb-3">
+                            <label for="company_name" class="form-label">Nome da Empresa</label>
+                            <input type="text" class="form-control" id="company_name" name="company_name" value="<?= htmlspecialchars($data['company_name'] ?? ($user['company_name'] ?? '')) ?>">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cnpj" class="form-label">CNPJ</label>
+                            <input type="text" class="form-control" id="cnpj" name="cnpj" value="<?= htmlspecialchars($data['cnpj'] ?? ($user['cnpj'] ?? '')) ?>" placeholder="00.000.000/0000-00">
+                        </div>
+
+                        <div class="mb-3">
                             <label for="email" class="form-label">Email *</label>
                             <input type="email" class="form-control" id="email" name="email" value="<?= htmlspecialchars($data['email'] ?? $user['email']) ?>" required>
                         </div>

@@ -49,6 +49,8 @@ class AuthController extends Controller {
                 'name' => $_POST['name'] ?? '',
                 'email' => $_POST['email'] ?? '',
                 'phone' => $_POST['phone'] ?? '',
+                'company_name' => $_POST['company_name'] ?? '',
+                'cnpj' => $_POST['cnpj'] ?? '',
                 'password' => $_POST['password'] ?? '',
                 'confirm_password' => $_POST['confirm_password'] ?? ''
             ];

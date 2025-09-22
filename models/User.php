@@ -8,11 +8,13 @@ class User {
     }
     
     public function create($data) {
-        $sql = "INSERT INTO users (name, email, phone, password, user_type) VALUES (?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO users (name, email, phone, company_name, cnpj, password, user_type) VALUES (?, ?, ?, ?, ?, ?, ?)";
         $params = [
             $data['name'],
             $data['email'],
             $data['phone'] ?? null,
+            $data['company_name'] ?? null,
+            $data['cnpj'] ?? null,
             password_hash($data['password'], PASSWORD_DEFAULT),
             $data['user_type'] ?? 'client'
         ];

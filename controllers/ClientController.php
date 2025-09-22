@@ -31,7 +31,9 @@ class ClientController extends Controller {
             $data = [
                 'name' => $_POST['name'] ?? '',
                 'email' => $_POST['email'] ?? '',
-                'phone' => $_POST['phone'] ?? ''
+                'phone' => $_POST['phone'] ?? '',
+                'company_name' => $_POST['company_name'] ?? '',
+                'cnpj' => $_POST['cnpj'] ?? ''
             ];
             
             $errors = $this->validateRequired(['name', 'email'], $data);
