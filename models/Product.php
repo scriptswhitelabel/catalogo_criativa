@@ -93,8 +93,10 @@ class Product {
     }
     
     public function addImage($productId, $imagePath, $isPrimary = false) {
+        // Normalize boolean to integer to satisfy strict MySQL (0/1 instead of empty string)
+        $isPrimaryInt = $isPrimary ? 1 : 0;
         $sql = "INSERT INTO product_images (product_id, image_path, is_primary) VALUES (?, ?, ?)";
-        return $this->db->query($sql, [$productId, $imagePath, $isPrimary]);
+        return $this->db->query($sql, [$productId, $imagePath, $isPrimaryInt]);
     }
     
     public function getImages($productId) {
