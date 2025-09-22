@@ -238,6 +238,27 @@ class AdminController extends Controller {
         $this->view('admin/clients', ['clients' => $clients]);
     }
     
+    public function clientDetail() {
+        $id = $_GET['id'] ?? null;
+        
+        if (!$id) {
+            $this->redirect(BASE_URL . '?controller=admin&action=clients');
+        }
+        
+        $client = $this->userModel->findById($id);
+        if (!$client) {
+            $this->redirect(BASE_URL . '?controller=admin&action=clients');
+        }
+        
+        // Pedidos do cliente
+        $orders = $this->orderModel->getAll(['user_id' => $id]);
+        
+        $this->view('admin/client_detail', [
+            'client' => $client,
+            'orders' => $orders
+        ]);
+    }
+    
     public function orders() {
         $orders = $this->orderModel->getAll();
         
