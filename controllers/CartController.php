@@ -30,6 +30,21 @@ class CartController extends Controller {
             }
         }
         
+        // Suporte a requisições AJAX: retorna o total de itens no carrinho
+        $isAjax = (
+            !empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
+        ) || (!empty($_POST['ajax']) && $_POST['ajax'] == '1');
+        
+        if ($isAjax) {
+            $count = array_sum($_SESSION['cart']);
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => true,
+                'count' => $count
+            ]);
+            exit;
+        }
+        
         $this->redirect(BASE_URL . '?controller=cart&action=index');
     }
     

@@ -41,14 +41,21 @@
             const formData = new FormData();
             formData.append('product_id', productId);
             formData.append('quantity', quantity);
+            formData.append('ajax', '1');
             
             fetch('<?= BASE_URL ?>?controller=cart&action=add', {
                 method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 body: formData
             })
-            .then(response => {
-                if (response.ok) {
-                    location.reload();
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.success) {
+                    const badge = document.getElementById('cart-count');
+                    if (badge) {
+                        badge.textContent = data.count;
+                        badge.style.display = (data.count > 0) ? 'flex' : 'none';
+                    }
                 }
             })
             .catch(error => {

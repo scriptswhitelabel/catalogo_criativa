@@ -65,11 +65,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= BASE_URL ?>?controller=cart&action=index">
+                        <a class="nav-link position-relative" href="<?= BASE_URL ?>?controller=cart&action=index">
                             <i class="fas fa-shopping-cart"></i> Carrinho
-                            <?php if (!empty($_SESSION['cart'])): ?>
-                                <span class="cart-badge"><?= array_sum($_SESSION['cart']) ?></span>
-                            <?php endif; ?>
+                            <span id="cart-count" class="cart-badge" style="display: <?= !empty($_SESSION['cart']) ? 'flex' : 'none' ?>;">
+                                <?= !empty($_SESSION['cart']) ? array_sum($_SESSION['cart']) : 0 ?>
+                            </span>
                         </a>
                     </li>
                 </ul>
