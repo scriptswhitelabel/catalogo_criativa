@@ -12,6 +12,39 @@ class CartController extends Controller {
         if (!isset($_SESSION['cart'])) {
             $_SESSION['cart'] = [];
         }
+
+        // Inicializar carrinho da sessão a partir do cookie persistente (30 dias)
+        if (!empty($_COOKIE['cart'])) {
+            $cookieCart = json_decode($_COOKIE['cart'], true);
+            if (is_array($cookieCart)) {
+                foreach ($cookieCart as $pid => $qty) {
+                    $pid = (string)$pid;
+                    $qty = (int)$qty;
+                    if ($qty > 0) {
+                        if (isset($_SESSION['cart'][$pid])) {
+                            $_SESSION['cart'][$pid] += $qty;
+                        } else {
+                            $_SESSION['cart'][$pid] = $qty;
+                        }
+                    }
+                }
+                $this->saveCartCookie();
+            }
+        }
+    }
+
+    private function saveCartCookie() {
+        // Persistir por 30 dias
+        $expires = time() + (60 * 60 * 24 * 30);
+        // Garantir apenas inteiros positivos no cookie
+        $cart = [];
+        foreach ($_SESSION['cart'] as $pid => $qty) {
+            $qty = (int)$qty;
+            if ($qty > 0) {
+                $cart[(string)$pid] = $qty;
+            }
+        }
+        setcookie('cart', json_encode($cart), $expires, '/');
     }
     
     public function add() {
@@ -27,6 +60,7 @@ class CartController extends Controller {
                 } else {
                     $_SESSION['cart'][$productId] = $quantity;
                 }
+                $this->saveCartCookie();
             }
         }
         
@@ -53,6 +87,7 @@ class CartController extends Controller {
         
         if ($productId && isset($_SESSION['cart'][$productId])) {
             unset($_SESSION['cart'][$productId]);
+            $this->saveCartCookie();
         }
         
         $this->redirect(BASE_URL . '?controller=cart&action=index');
@@ -68,6 +103,7 @@ class CartController extends Controller {
             } else {
                 unset($_SESSION['cart'][$productId]);
             }
+            $this->saveCartCookie();
         }
         
         $this->redirect(BASE_URL . '?controller=cart&action=index');
@@ -174,8 +210,9 @@ class CartController extends Controller {
                     );
                 }
                 
-                // Limpar carrinho
+                // Limpar carrinho (sessão e cookie persistente)
                 $_SESSION['cart'] = [];
+                $this->saveCartCookie();
                 
                 $this->redirect(BASE_URL . '?controller=cart&action=success&order_id=' . $orderId);
             }
