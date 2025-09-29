@@ -26,6 +26,30 @@ class AuthController extends Controller {
                 
                 if ($user && $this->userModel->verifyPassword($password, $user['password'])) {
                     Auth::login($user['id'], $user['user_type']);
+                    // Migrar carrinho de convidado para carrinho do usuário
+                    $guestCookie = $_COOKIE['cart_guest'] ?? null;
+                    if ($guestCookie) {
+                        $guestCart = json_decode($guestCookie, true);
+                        if (is_array($guestCart)) {
+                            // Carregar eventual cookie do usuário e mesclar
+                            $userCookieName = 'cart_u_' . $user['id'];
+                            $userCart = [];
+                            if (!empty($_COOKIE[$userCookieName])) {
+                                $tmp = json_decode($_COOKIE[$userCookieName], true);
+                                if (is_array($tmp)) { $userCart = $tmp; }
+                            }
+                            foreach ($guestCart as $pid => $qty) {
+                                $qty = (int)$qty;
+                                if ($qty <= 0) { continue; }
+                                if (isset($userCart[$pid])) { $userCart[$pid] += $qty; }
+                                else { $userCart[$pid] = $qty; }
+                            }
+                            $expires = time() + (60 * 60 * 24 * 30);
+                            setcookie($userCookieName, json_encode($userCart), $expires, '/');
+                        }
+                        // Limpar cookie de convidado
+                        setcookie('cart_guest', '', time() - 3600, '/');
+                    }
                     
                     if ($user['user_type'] === 'admin') {
                         $this->redirect(BASE_URL . '?controller=admin&action=dashboard');

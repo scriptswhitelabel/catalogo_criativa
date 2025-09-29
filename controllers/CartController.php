@@ -14,9 +14,12 @@ class CartController extends Controller {
         }
 
         // Inicializar carrinho da sessão a partir do cookie persistente (30 dias)
+        // Usa cookie separado por usuário logado: cart_u_{userId}; para visitantes: cart_guest
+        $cookieName = $this->getCartCookieName();
+        $initializedFlag = 'cart_initialized_from_cookie_' . $cookieName;
         // Somente quando o carrinho da sessão estiver vazio e ainda não tenha sido importado
-        if (empty($_SESSION['cart']) && empty($_SESSION['cart_initialized_from_cookie']) && !empty($_COOKIE['cart'])) {
-            $cookieCart = json_decode($_COOKIE['cart'], true);
+        if (empty($_SESSION['cart']) && empty($_SESSION[$initializedFlag]) && !empty($_COOKIE[$cookieName])) {
+            $cookieCart = json_decode($_COOKIE[$cookieName], true);
             if (is_array($cookieCart)) {
                 $_SESSION['cart'] = [];
                 foreach ($cookieCart as $pid => $qty) {
@@ -26,9 +29,17 @@ class CartController extends Controller {
                         $_SESSION['cart'][$pid] = $qty;
                     }
                 }
-                $_SESSION['cart_initialized_from_cookie'] = true;
+                $_SESSION[$initializedFlag] = true;
             }
         }
+    }
+
+    private function getCartCookieName() {
+        if (Auth::isLoggedIn()) {
+            $userId = Auth::getUserId();
+            return 'cart_u_' . $userId;
+        }
+        return 'cart_guest';
     }
 
     private function saveCartCookie() {
@@ -42,7 +53,8 @@ class CartController extends Controller {
                 $cart[(string)$pid] = $qty;
             }
         }
-        setcookie('cart', json_encode($cart), $expires, '/');
+        $cookieName = $this->getCartCookieName();
+        setcookie($cookieName, json_encode($cart), $expires, '/');
     }
     
     public function add() {
@@ -269,3 +281,4 @@ class CartController extends Controller {
     }
 }
 ?>
+
