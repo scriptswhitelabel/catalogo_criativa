@@ -106,6 +106,12 @@
                             <input type="file" class="form-control" id="images" name="images[]" multiple accept="image/*">
                             <div class="form-text">Selecione uma ou mais imagens. A primeira será a imagem principal.</div>
                         </div>
+
+                        <div class="mb-3">
+                            <label for="image_urls" class="form-label">Imagens por URL</label>
+                            <textarea class="form-control" id="image_urls" name="image_urls" rows="3" placeholder="Cole uma ou mais URLs de imagens (uma por linha)"></textarea>
+                            <div class="form-text">O sistema fará o download e salvará as imagens acima. Se não houver upload de arquivo, a primeira URL vira imagem principal.</div>
+                        </div>
                         
                         <div class="mb-3">
                             <label for="video" class="form-label">Vídeo (Arquivo)</label>
@@ -114,7 +120,8 @@
                         
                         <div class="mb-3">
                             <label for="video_url" class="form-label">Vídeo (URL)</label>
-                            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=...">
+                            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="URL direta do vídeo (mp4, webm) ou link do YouTube/Vimeo">
+                            <div class="form-text">Se a URL apontar para um arquivo de vídeo, vamos baixá-lo. Caso contrário, salvaremos a URL externa.</div>
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">

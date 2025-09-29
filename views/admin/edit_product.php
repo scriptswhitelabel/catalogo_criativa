@@ -111,6 +111,17 @@
                                 Selecione uma ou mais imagens para adicionar ao produto. Formatos aceitos: JPG, PNG, GIF.
                             </div>
                         </div>
+
+                        <!-- URLs de Imagens -->
+                        <div class="mb-3">
+                            <label for="image_urls" class="form-label">
+                                <i class="fas fa-link"></i> URLs de Imagens (uma por linha)
+                            </label>
+                            <textarea class="form-control" id="image_urls" name="image_urls" rows="3" placeholder="https://exemplo.com/imagem1.jpg\nhttps://exemplo.com/imagem2.png"></textarea>
+                            <div class="form-text">
+                                O sistema fará o download e salvará as imagens acima.
+                            </div>
+                        </div>
                         
                         <!-- Upload de Vídeo -->
                         <div class="mb-3">
@@ -128,9 +139,9 @@
                             <label for="video_url" class="form-label">
                                 <i class="fas fa-link"></i> URL do Vídeo (YouTube, Vimeo, etc.)
                             </label>
-                            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="https://www.youtube.com/watch?v=...">
+                            <input type="url" class="form-control" id="video_url" name="video_url" placeholder="URL direta do vídeo (mp4, webm) ou link do YouTube/Vimeo">
                             <div class="form-text">
-                                Cole aqui a URL do vídeo do produto (opcional).
+                                Se a URL apontar para um arquivo de vídeo, vamos baixá-lo. Caso contrário, salvaremos a URL externa.
                             </div>
                         </div>
                         

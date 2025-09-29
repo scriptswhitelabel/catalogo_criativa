@@ -64,7 +64,7 @@ class AdminController extends Controller {
             if (empty($errors)) {
                 $productId = $this->productModel->create($data);
                 
-                // Upload de imagens
+                // Upload de imagens (arquivos)
                 if (!empty($_FILES['images']['name'][0])) {
                     foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
                         if (!empty($tmpName)) {
@@ -82,8 +82,23 @@ class AdminController extends Controller {
                         }
                     }
                 }
+
+                // Download de imagens por URL (suporta múltiplas URLs separadas por quebra de linha)
+                if (!empty($_POST['image_urls'])) {
+                    $urls = preg_split('/\r\n|\r|\n/', trim($_POST['image_urls']));
+                    $position = 0;
+                    foreach ($urls as $imgUrl) {
+                        $imgUrl = trim($imgUrl);
+                        if ($imgUrl === '') { continue; }
+                        $downloaded = $this->downloadFileFromUrl($imgUrl, 'uploads/products/', 'image');
+                        if ($downloaded) {
+                            $this->productModel->addImage($productId, $downloaded, $position === 0 && empty($_FILES['images']['name'][0]));
+                            $position++;
+                        }
+                    }
+                }
                 
-                // Upload de vídeo
+                // Upload de vídeo (arquivo)
                 if (!empty($_FILES['video']['tmp_name'])) {
                     $videoPath = $this->uploadFile($_FILES['video'], 'uploads/videos/');
                     if ($videoPath) {
@@ -91,9 +106,16 @@ class AdminController extends Controller {
                     }
                 }
                 
-                // URL de vídeo
+                // Download de vídeo por URL OU salvar URL externa
                 if (!empty($_POST['video_url'])) {
-                    $this->productModel->addVideo($productId, null, $_POST['video_url']);
+                    $videoUrl = trim($_POST['video_url']);
+                    // Tentar baixar se for arquivo direto (mp4, webm etc.). Se falhar, salva URL externa.
+                    $downloadedVideo = $this->downloadFileFromUrl($videoUrl, 'uploads/videos/', 'video');
+                    if ($downloadedVideo) {
+                        $this->productModel->addVideo($productId, $downloadedVideo, null);
+                    } else {
+                        $this->productModel->addVideo($productId, null, $videoUrl);
+                    }
                 }
                 
                 $this->redirect(BASE_URL . '?controller=admin&action=products');
@@ -150,7 +172,7 @@ class AdminController extends Controller {
                 
                 $uploadMessages = [];
                 
-                // Upload de novas imagens
+                // Upload de novas imagens (arquivos)
                 if (!empty($_FILES['images']['name'][0])) {
                     $uploadedImages = 0;
                     foreach ($_FILES['images']['tmp_name'] as $key => $tmpName) {
@@ -173,8 +195,26 @@ class AdminController extends Controller {
                         $uploadMessages[] = "$uploadedImages imagem(ns) adicionada(s) com sucesso!";
                     }
                 }
+
+                // Download de novas imagens por URL (múltiplas linhas)
+                if (!empty($_POST['image_urls'])) {
+                    $urls = preg_split('/\r\n|\r|\n/', trim($_POST['image_urls']));
+                    $downloadedImages = 0;
+                    foreach ($urls as $imgUrl) {
+                        $imgUrl = trim($imgUrl);
+                        if ($imgUrl === '') { continue; }
+                        $downloaded = $this->downloadFileFromUrl($imgUrl, 'uploads/products/', 'image');
+                        if ($downloaded) {
+                            $this->productModel->addImage($id, $downloaded, false);
+                            $downloadedImages++;
+                        }
+                    }
+                    if ($downloadedImages > 0) {
+                        $uploadMessages[] = "$downloadedImages imagem(ns) baixada(s) por URL com sucesso!";
+                    }
+                }
                 
-                // Upload de vídeo
+                // Upload de vídeo (arquivo)
                 if (!empty($_FILES['video']['tmp_name'])) {
                     $videoPath = $this->uploadFile($_FILES['video'], 'uploads/videos/');
                     if ($videoPath) {
@@ -183,10 +223,17 @@ class AdminController extends Controller {
                     }
                 }
                 
-                // URL de vídeo
+                // Download de vídeo por URL OU salvar URL externa
                 if (!empty($_POST['video_url'])) {
-                    $this->productModel->addVideo($id, null, $_POST['video_url']);
-                    $uploadMessages[] = "URL de vídeo adicionada com sucesso!";
+                    $videoUrl = trim($_POST['video_url']);
+                    $downloadedVideo = $this->downloadFileFromUrl($videoUrl, 'uploads/videos/', 'video');
+                    if ($downloadedVideo) {
+                        $this->productModel->addVideo($id, $downloadedVideo, null);
+                        $uploadMessages[] = "Vídeo baixado por URL com sucesso!";
+                    } else {
+                        $this->productModel->addVideo($id, null, $videoUrl);
+                        $uploadMessages[] = "URL de vídeo adicionada com sucesso!";
+                    }
                 }
                 
                 if (!empty($uploadMessages)) {
