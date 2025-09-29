@@ -56,6 +56,25 @@ class CartController extends Controller {
         $cookieName = $this->getCartCookieName();
         setcookie($cookieName, json_encode($cart), $expires, '/');
     }
+
+    private function normalizePhoneToE164Digits($raw) {
+        // Remove tudo que não for número
+        $digits = preg_replace('/\D+/', '', (string)$raw);
+        if ($digits === '') { return ''; }
+        // Remove zeros à esquerda comuns em algumas entradas
+        $digits = ltrim($digits, '0');
+        // Se já começar com 55 (Brasil), mantém
+        if (strpos($digits, '55') === 0) {
+            return $digits;
+        }
+        // Se tiver 10 ou 11 dígitos (DDD + número), prefixa 55
+        $len = strlen($digits);
+        if ($len === 10 || $len === 11) {
+            return '55' . $digits;
+        }
+        // Caso tenha outro comprimento, retorna como está (já pode estar internacional ex: 1..., 351..., etc.)
+        return $digits;
+    }
     
     public function add() {
         $productId = $_POST['product_id'] ?? null;
@@ -232,19 +251,19 @@ class CartController extends Controller {
                         $parts = explode(',', $numbersCsv);
                         foreach ($parts as $p) {
                             $p = trim($p);
-                            if ($p !== '') { $numbers[] = $p; }
+                            if ($p !== '') { $numbers[] = $this->normalizePhoneToE164Digits($p); }
                         }
                     } else {
                         $single = Env::get('WHATICKET_NUMBER', '');
-                        if (!empty($single)) { $numbers[] = $single; }
+                        if (!empty($single)) { $numbers[] = $this->normalizePhoneToE164Digits($single); }
                     }
                     // Adicionar telefone da loja se existir
                     $storePhone = SettingsHelper::getStorePhone();
-                    $digits = preg_replace('/\D+/', '', $storePhone);
+                    $digits = $this->normalizePhoneToE164Digits($storePhone);
                     if (!empty($digits)) { $numbers[] = $digits; }
                     // Adicionar telefone do cliente do pedido, se existir
                     if (!empty($order) && !empty($order['user_phone'])) {
-                        $clientDigits = preg_replace('/\D+/', '', $order['user_phone']);
+                        $clientDigits = $this->normalizePhoneToE164Digits($order['user_phone']);
                         if (!empty($clientDigits)) { $numbers[] = $clientDigits; }
                     }
                     // Remover duplicados
