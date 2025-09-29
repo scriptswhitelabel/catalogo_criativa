@@ -70,7 +70,17 @@ Sistema completo de e-commerce desenvolvido em PHP com arquitetura MVC, incluind
    chmod 755 uploads/videos/
    ```
 
-5. **Acesse o sistema:**
+5. **Configurar .env (Whaticket):**
+   Crie um arquivo `.env` na raiz do projeto com:
+   ```
+   WHATICKET_API="https://apiweb.ultrawhats.com.br"
+   WHATICKET_TOKEN="ultranotificacoes"
+   WHATICKET_NUMBER="5518998020650"  # Número E.164 (sem +)
+   WHATICKET_USER_ID=""   # Opcional
+   WHATICKET_QUEUE_ID="15"  # Opcional
+   ```
+
+6. **Acesse o sistema:**
    - URL: `http://localhost/criativaLoja`
    - Admin: `admin@criativa.com` / `password`
 

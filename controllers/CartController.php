@@ -220,6 +220,49 @@ class CartController extends Controller {
                     );
                 }
                 
+                // Enviar notificação do pedido via Whaticket
+                try {
+                    require_once 'core/Env.php';
+                    require_once 'core/WhaticketClient.php';
+                    $client = new WhaticketClient();
+                    // Números de destino: .env WHATICKET_NUMBERS (lista separada por vírgula) ou WHATICKET_NUMBER único; inclui telefone da loja como fallback
+                    $numbersCsv = Env::get('WHATICKET_NUMBERS', '');
+                    $numbers = [];
+                    if (!empty($numbersCsv)) {
+                        $parts = explode(',', $numbersCsv);
+                        foreach ($parts as $p) {
+                            $p = trim($p);
+                            if ($p !== '') { $numbers[] = $p; }
+                        }
+                    } else {
+                        $single = Env::get('WHATICKET_NUMBER', '');
+                        if (!empty($single)) { $numbers[] = $single; }
+                    }
+                    // Adicionar telefone da loja se existir
+                    $storePhone = SettingsHelper::getStorePhone();
+                    $digits = preg_replace('/\D+/', '', $storePhone);
+                    if (!empty($digits)) { $numbers[] = $digits; }
+                    // Remover duplicados
+                    $numbers = array_values(array_unique($numbers));
+                    // Mensagem com resumo do pedido
+                    $lines = [];
+                    $lines[] = "🚨 ALERTA! NOVO PEDIDO REALIZADO PELO SISTEMA";
+                    $lines[] = "Pedido #{$orderId}";
+                    $lines[] = "Total: R$ " . number_format($total, 2, ',', '.');
+                    foreach ($cartItems as $item) {
+                        $lines[] = "- {$item['product']['name']} x{$item['quantity']} (R$ " . number_format($item['product']['unit_price'], 2, ',', '.') . ")";
+                    }
+                    if (!empty($notes)) {
+                        $lines[] = "Obs: " . $notes;
+                    }
+                    $message = implode("\n", $lines);
+                    if (!empty($numbers)) {
+                        $client->sendToMany($numbers, $message);
+                    }
+                } catch (Exception $e) {
+                    // Silenciar falha de notificação para não quebrar o fluxo do pedido
+                }
+
                 // Limpar carrinho (sessão e cookie persistente)
                 $_SESSION['cart'] = [];
                 $this->saveCartCookie();
