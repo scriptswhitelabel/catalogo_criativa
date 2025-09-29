@@ -21,5 +21,15 @@ class Category {
         $sql = "INSERT INTO categories (name, description) VALUES (?, ?)";
         return $this->db->query($sql, [$data['name'], $data['description']]);
     }
+
+    public function update($id, $data) {
+        $sql = "UPDATE categories SET name = ?, description = ? WHERE id = ?";
+        return $this->db->query($sql, [$data['name'], $data['description'], $id]);
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM categories WHERE id = ?";
+        return $this->db->query($sql, [$id]);
+    }
 }
 ?>

@@ -21,5 +21,15 @@ class Brand {
         $sql = "INSERT INTO brands (name, description) VALUES (?, ?)";
         return $this->db->query($sql, [$data['name'], $data['description']]);
     }
+
+    public function update($id, $data) {
+        $sql = "UPDATE brands SET name = ?, description = ? WHERE id = ?";
+        return $this->db->query($sql, [$data['name'], $data['description'], $id]);
+    }
+
+    public function delete($id) {
+        $sql = "DELETE FROM brands WHERE id = ?";
+        return $this->db->query($sql, [$id]);
+    }
 }
 ?>

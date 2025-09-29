@@ -46,6 +46,108 @@ class AdminController extends Controller {
             'productModel' => $this->productModel
         ]);
     }
+
+    // ====== CATEGORIES CRUD ======
+    public function categories() {
+        $categories = $this->categoryModel->getAll();
+        $this->view('admin/categories', ['categories' => $categories]);
+    }
+
+    public function createCategory() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'] ?? '',
+                'description' => $_POST['description'] ?? ''
+            ];
+            $errors = $this->validateRequired(['name'], $data);
+            if (empty($errors)) {
+                $this->categoryModel->create($data);
+                $this->redirect(BASE_URL . '?controller=admin&action=categories');
+            }
+            $this->view('admin/category_form', ['errors' => $errors, 'data' => $data]);
+        } else {
+            $this->view('admin/category_form');
+        }
+    }
+
+    public function editCategory() {
+        $id = $_GET['id'] ?? null;
+        if (!$id) { $this->redirect(BASE_URL . '?controller=admin&action=categories'); }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'] ?? '',
+                'description' => $_POST['description'] ?? ''
+            ];
+            $errors = $this->validateRequired(['name'], $data);
+            if (empty($errors)) {
+                $this->categoryModel->update($id, $data);
+                $this->redirect(BASE_URL . '?controller=admin&action=categories');
+            }
+            $category = $this->categoryModel->findById($id);
+            $this->view('admin/category_form', ['errors' => $errors, 'data' => $data, 'category' => $category]);
+        } else {
+            $category = $this->categoryModel->findById($id);
+            if (!$category) { $this->redirect(BASE_URL . '?controller=admin&action=categories'); }
+            $this->view('admin/category_form', ['category' => $category]);
+        }
+    }
+
+    public function deleteCategory() {
+        $id = $_GET['id'] ?? null;
+        if ($id) { $this->categoryModel->delete($id); }
+        $this->redirect(BASE_URL . '?controller=admin&action=categories');
+    }
+
+    // ====== BRANDS CRUD ======
+    public function brands() {
+        $brands = $this->brandModel->getAll();
+        $this->view('admin/brands', ['brands' => $brands]);
+    }
+
+    public function createBrand() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'] ?? '',
+                'description' => $_POST['description'] ?? ''
+            ];
+            $errors = $this->validateRequired(['name'], $data);
+            if (empty($errors)) {
+                $this->brandModel->create($data);
+                $this->redirect(BASE_URL . '?controller=admin&action=brands');
+            }
+            $this->view('admin/brand_form', ['errors' => $errors, 'data' => $data]);
+        } else {
+            $this->view('admin/brand_form');
+        }
+    }
+
+    public function editBrand() {
+        $id = $_GET['id'] ?? null;
+        if (!$id) { $this->redirect(BASE_URL . '?controller=admin&action=brands'); }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = [
+                'name' => $_POST['name'] ?? '',
+                'description' => $_POST['description'] ?? ''
+            ];
+            $errors = $this->validateRequired(['name'], $data);
+            if (empty($errors)) {
+                $this->brandModel->update($id, $data);
+                $this->redirect(BASE_URL . '?controller=admin&action=brands');
+            }
+            $brand = $this->brandModel->findById($id);
+            $this->view('admin/brand_form', ['errors' => $errors, 'data' => $data, 'brand' => $brand]);
+        } else {
+            $brand = $this->brandModel->findById($id);
+            if (!$brand) { $this->redirect(BASE_URL . '?controller=admin&action=brands'); }
+            $this->view('admin/brand_form', ['brand' => $brand]);
+        }
+    }
+
+    public function deleteBrand() {
+        $id = $_GET['id'] ?? null;
+        if ($id) { $this->brandModel->delete($id); }
+        $this->redirect(BASE_URL . '?controller=admin&action=brands');
+    }
     
     public function createProduct() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
