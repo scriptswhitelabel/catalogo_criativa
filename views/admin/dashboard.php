@@ -112,6 +112,16 @@
                                 <i class="fas fa-cog"></i> Configurações da Loja
                             </a>
                         </div>
+                        <div class="col-md-3">
+                            <a href="<?= BASE_URL ?>?controller=admin&action=categories" class="btn btn-outline-secondary w-100 mb-2">
+                                <i class="fas fa-tags"></i> Gerenciar Categorias
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="<?= BASE_URL ?>?controller=admin&action=brands" class="btn btn-outline-secondary w-100 mb-2">
+                                <i class="fas fa-copyright"></i> Gerenciar Marcas
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
