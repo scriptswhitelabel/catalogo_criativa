@@ -242,6 +242,11 @@ class CartController extends Controller {
                     $storePhone = SettingsHelper::getStorePhone();
                     $digits = preg_replace('/\D+/', '', $storePhone);
                     if (!empty($digits)) { $numbers[] = $digits; }
+                    // Adicionar telefone do cliente do pedido, se existir
+                    if (!empty($order) && !empty($order['user_phone'])) {
+                        $clientDigits = preg_replace('/\D+/', '', $order['user_phone']);
+                        if (!empty($clientDigits)) { $numbers[] = $clientDigits; }
+                    }
                     // Remover duplicados
                     $numbers = array_values(array_unique($numbers));
                     // Buscar dados do pedido para incluir cliente e data/hora
