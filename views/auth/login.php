@@ -26,7 +26,13 @@
                         
                         <div class="mb-3">
                             <label for="password" class="form-label">Senha</label>
-                            <input type="password" class="form-control" id="password" name="password" required>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword" aria-label="Mostrar/ocultar senha">
+                                    <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">Clique no olho para mostrar/ocultar a senha.</div>
                         </div>
                         
                         <div class="d-grid">
@@ -44,5 +50,21 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var passwordInput = document.getElementById('password');
+    var toggleBtn = document.getElementById('togglePassword');
+    var toggleIcon = document.getElementById('togglePasswordIcon');
+    if (passwordInput && toggleBtn && toggleIcon) {
+        toggleBtn.addEventListener('click', function () {
+            var isPassword = passwordInput.getAttribute('type') === 'password';
+            passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+            toggleIcon.classList.toggle('fa-eye');
+            toggleIcon.classList.toggle('fa-eye-slash');
+        });
+    }
+});
+</script>
 
 <?php require_once 'views/layout/footer.php'; ?>
