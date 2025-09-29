@@ -244,7 +244,16 @@ class CartController extends Controller {
                     require_once 'core/Env.php';
                     require_once 'core/WhaticketClient.php';
                     $client = new WhaticketClient();
-                    // Números de destino: .env WHATICKET_NUMBERS (lista separada por vírgula) ou WHATICKET_NUMBER único; inclui telefone da loja como fallback
+                    // Buscar dados do pedido para incluir cliente e data/hora e telefone do cliente
+                    $order = $this->orderModel->findById($orderId);
+                    $orderDate = '';
+                    $customerName = '';
+                    if ($order) {
+                        $orderDate = !empty($order['created_at']) ? date('d/m/Y H:i', strtotime($order['created_at'])) : date('d/m/Y H:i');
+                        $customerName = $order['user_name'] ?? '';
+                    }
+
+                    // Números de destino: .env WHATICKET_NUMBERS (lista separada por vírgula) ou WHATICKET_NUMBER único; inclui telefone da loja e do cliente como fallback
                     $numbersCsv = Env::get('WHATICKET_NUMBERS', '');
                     $numbers = [];
                     if (!empty($numbersCsv)) {
@@ -268,14 +277,6 @@ class CartController extends Controller {
                     }
                     // Remover duplicados
                     $numbers = array_values(array_unique($numbers));
-                    // Buscar dados do pedido para incluir cliente e data/hora
-                    $order = $this->orderModel->findById($orderId);
-                    $orderDate = '';
-                    $customerName = '';
-                    if ($order) {
-                        $orderDate = !empty($order['created_at']) ? date('d/m/Y H:i', strtotime($order['created_at'])) : date('d/m/Y H:i');
-                        $customerName = $order['user_name'] ?? '';
-                    }
 
                     // Mensagem com resumo do pedido
                     $lines = [];
