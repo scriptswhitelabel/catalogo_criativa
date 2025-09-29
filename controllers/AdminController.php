@@ -151,13 +151,17 @@ class AdminController extends Controller {
     
     public function createProduct() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Normalizações para evitar strings vazias em colunas inteiras/numéricas
+            $brandIdRaw = $_POST['brand_id'] ?? '';
+            $categoryIdRaw = $_POST['category_id'] ?? '';
+            $packagePriceRaw = $_POST['package_price'] ?? '';
             $data = [
                 'name' => $_POST['name'] ?? '',
-                'brand_id' => $_POST['brand_id'] ?? null,
-                'category_id' => $_POST['category_id'] ?? null,
+                'brand_id' => ($brandIdRaw === '' ? null : (int)$brandIdRaw),
+                'category_id' => ($categoryIdRaw === '' ? null : (int)$categoryIdRaw),
                 'description' => $_POST['description'] ?? '',
-                'unit_price' => $_POST['unit_price'] ?? 0,
-                'package_price' => $_POST['package_price'] ?? null,
+                'unit_price' => isset($_POST['unit_price']) ? (float)$_POST['unit_price'] : 0,
+                'package_price' => ($packagePriceRaw === '' ? null : (float)$packagePriceRaw),
                 'status' => $_POST['status'] ?? 'available'
             ];
             
@@ -257,13 +261,16 @@ class AdminController extends Controller {
         }
         
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $brandIdRaw = $_POST['brand_id'] ?? '';
+            $categoryIdRaw = $_POST['category_id'] ?? '';
+            $packagePriceRaw = $_POST['package_price'] ?? '';
             $data = [
                 'name' => $_POST['name'] ?? '',
-                'brand_id' => $_POST['brand_id'] ?? null,
-                'category_id' => $_POST['category_id'] ?? null,
+                'brand_id' => ($brandIdRaw === '' ? null : (int)$brandIdRaw),
+                'category_id' => ($categoryIdRaw === '' ? null : (int)$categoryIdRaw),
                 'description' => $_POST['description'] ?? '',
-                'unit_price' => $_POST['unit_price'] ?? 0,
-                'package_price' => $_POST['package_price'] ?? null,
+                'unit_price' => isset($_POST['unit_price']) ? (float)$_POST['unit_price'] : 0,
+                'package_price' => ($packagePriceRaw === '' ? null : (float)$packagePriceRaw),
                 'status' => $_POST['status'] ?? 'available'
             ];
             
