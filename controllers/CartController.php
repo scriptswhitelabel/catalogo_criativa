@@ -244,10 +244,21 @@ class CartController extends Controller {
                     if (!empty($digits)) { $numbers[] = $digits; }
                     // Remover duplicados
                     $numbers = array_values(array_unique($numbers));
+                    // Buscar dados do pedido para incluir cliente e data/hora
+                    $order = $this->orderModel->findById($orderId);
+                    $orderDate = '';
+                    $customerName = '';
+                    if ($order) {
+                        $orderDate = !empty($order['created_at']) ? date('d/m/Y H:i', strtotime($order['created_at'])) : date('d/m/Y H:i');
+                        $customerName = $order['user_name'] ?? '';
+                    }
+
                     // Mensagem com resumo do pedido
                     $lines = [];
                     $lines[] = "🚨 ALERTA! NOVO PEDIDO REALIZADO PELO SISTEMA";
                     $lines[] = "Pedido #{$orderId}";
+                    if (!empty($customerName)) { $lines[] = "Cliente: {$customerName}"; }
+                    if (!empty($orderDate)) { $lines[] = "Data/Hora: {$orderDate}"; }
                     $lines[] = "Total: R$ " . number_format($total, 2, ',', '.');
                     foreach ($cartItems as $item) {
                         $lines[] = "- {$item['product']['name']} x{$item['quantity']} (R$ " . number_format($item['product']['unit_price'], 2, ',', '.') . ")";
